@@ -74,16 +74,18 @@ function filter_competvetsuivi_replacebygraph($matches) {
     }
     $comptag = $comptag->item(0);
     $graphtype = $comptag->attributes->getNamedItem('type')? $comptag->attributes->getNamedItem('type')->value: '';
-    $matrixsn = $comptag->attributes->getNamedItem('matrix')? $comptag->attributes->getNamedItem('matrix')->value:'';
-    $uename = $comptag->attributes->getNamedItem('uename')? $comptag->attributes->getNamedItem('uename')->value:'';
     $canproceed = $graphtype && in_array($graphtype,filter_competvetsuivi::GRAPH_TYPES);
-    $canproceed = $matrixsn && $DB->record_exists(
-            local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
+
+
+    // Default values
     $userid = $USER->id;
     $matrixid = 0;
-    $ue = null;
+    $uename = "";
+    $samesemester = true;
+
     if ($graphtype == 'studentprogress') {
         $userid = $comptag->attributes->getNamedItem('userid')->value;
+
         if (!$userid || !is_numeric($userid)) {
             $userid = $USER->id;
         }
@@ -92,6 +94,12 @@ function filter_competvetsuivi_replacebygraph($matches) {
             $canproceed = has_capability('block/competvetsuivi:canseeother', context_system::instance(), $USER);
         }
     } else {
+        $uename = $comptag->attributes->getNamedItem('uename')? $comptag->attributes->getNamedItem('uename')->value:'';
+        $matrixsn = $comptag->attributes->getNamedItem('matrix')? $comptag->attributes->getNamedItem('matrix')->value:'';
+        $samesemester = $comptag->attributes->getNamedItem('wholeyear')? false :true;
+        $canproceed = $canproceed && $matrixsn && $DB->record_exists(
+                                local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
+
         $matrixid = $DB->get_field(
                 local_competvetsuivi\matrix\matrix::CLASS_TABLE,'id',array('shortname'=>$matrixsn));
     }
@@ -118,6 +126,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                         $matrix,
                         $strandlist,
                         $userdata,
+                        0,
                         $currentsemester
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
@@ -136,7 +145,9 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $progress_overview = new \local_competvetsuivi\output\uevscompetency_overview(
                         $matrix,
                         $ue->id,
-                        $strandlist
+                        $strandlist,
+                        0,
+                        $samesemester
                 );
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
