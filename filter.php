@@ -96,7 +96,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
     } else {
         $uename = $comptag->attributes->getNamedItem('uename')? $comptag->attributes->getNamedItem('uename')->value:'';
         $matrixsn = $comptag->attributes->getNamedItem('matrix')? $comptag->attributes->getNamedItem('matrix')->value:'';
-        $samesemester = $comptag->attributes->getNamedItem('wholeyear')? false :true;
+        $samesemester = $comptag->attributes->getNamedItem('wholecursus')? false :true;
         $canproceed = $canproceed && $matrixsn && $DB->record_exists(
                                 local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
 
