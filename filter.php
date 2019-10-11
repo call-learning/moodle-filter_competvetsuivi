@@ -75,11 +75,13 @@ function filter_competvetsuivi_replacebygraph($matches) {
     $comptag = $comptag->item(0);
     $graphtype = $comptag->attributes->getNamedItem('type')? $comptag->attributes->getNamedItem('type')->value: '';
     $matrixsn = $comptag->attributes->getNamedItem('matrix')? $comptag->attributes->getNamedItem('matrix')->value:'';
-
+    $uename = $comptag->attributes->getNamedItem('uename')? $comptag->attributes->getNamedItem('uename')->value:'';
     $canproceed = $graphtype && in_array($graphtype,filter_competvetsuivi::GRAPH_TYPES);
-
+    $canproceed = $matrixsn && $DB->record_exists(
+            local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
     $userid = $USER->id;
     $matrixid = 0;
+    $ue = null;
     if ($graphtype == 'studentprogress') {
         $userid = $comptag->attributes->getNamedItem('userid')->value;
         if (!$userid || !is_numeric($userid)) {
@@ -89,19 +91,19 @@ function filter_competvetsuivi_replacebygraph($matches) {
         if ($USER->id != $userid) {
             $canproceed = has_capability('block/competvetsuivi:canseeother', context_system::instance(), $USER);
         }
-        $canproceed = $canproceed && $matrixid;
     } else {
-        $canproceed = $canproceed && $matrixsn && $DB->record_exists(
-                        local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
+        $matrixid = $DB->get_field(
+                local_competvetsuivi\matrix\matrix::CLASS_TABLE,'id',array('shortname'=>$matrixsn));
     }
+    $canproceed = $canproceed && $matrixid;
 
     if ($canproceed) {
+        $matrix = new matrix($matrixid);
+        $matrix->load_data();
         switch($graphtype) {
             case 'studentprogress':
-                $matrix = new matrix($matrixid);
                 $user = \core_user::get_user($userid);
                 $userdata = local_competvetsuivi\userdata::get_user_data($user->email);
-                $matrix->load_data();
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
                 $lastseenue = local_competvetsuivi\userdata::get_user_last_ue_name($user->email);
                 $currentsemester = ueutils::get_current_semester_index($lastseenue, $matrix);
@@ -122,6 +124,23 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $text = $renderer->render($progress_overview);
                 break;
             case 'ucoverview':
+                try {
+                    $ue = $matrix->get_matrix_ue_by_criteria('shortname', $uename);
+                } catch( moodle_exception $e) {
+                    return $text;
+                }
+
+                $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
+
+
+                $progress_overview = new \local_competvetsuivi\output\uevscompetency_overview(
+                        $matrix,
+                        $ue->id,
+                        $strandlist
+                );
+
+                $renderer = $PAGE->get_renderer('local_competvetsuivi');
+                $text = $renderer->render($progress_overview);
                 break;
         }
     }
