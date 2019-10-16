@@ -69,7 +69,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
 
     $comptag = $doc->getElementsByTagName('competvetsuivi');
 
-    if (!$comptag || !$comptag->count()) {
+    if (!$comptag || $comptag->length == 0) {
         return $text;
     }
     $comptag = $comptag->item(0);
