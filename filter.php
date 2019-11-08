@@ -115,7 +115,8 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
                 $lastseenue = local_competvetsuivi\userdata::get_user_last_ue_name($user->email);
                 $currentsemester = ueutils::get_current_semester_index($lastseenue, $matrix);
-                $currentcompid = optional_param('competencyid', 0, PARAM_INT);
+                $compidparamname = local_competvetsuivi\output\competency_progress_overview::PARAM_COMPID;
+                $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
                 $currentcomp = null;
                 if ($currentcompid) {
                     $currentcomp = $matrix->comp[$currentcompid];
