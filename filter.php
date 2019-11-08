@@ -115,14 +115,14 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
                 $lastseenue = local_competvetsuivi\userdata::get_user_last_ue_name($user->email);
                 $currentsemester = ueutils::get_current_semester_index($lastseenue, $matrix);
-                $compidparamname = local_competvetsuivi\output\competency_progress_overview::PARAM_COMPID;
+                $compidparamname = local_competvetsuivi\renderable\competency_progress_overview::PARAM_COMPID;
                 $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
                 $currentcomp = null;
                 if ($currentcompid) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progress_overview = new \local_competvetsuivi\output\competency_progress_overview(
+                $progress_overview = new \local_competvetsuivi\renderable\competency_progress_overview(
                         $currentcomp,
                         $matrix,
                         $strandlist,
@@ -142,11 +142,18 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
 
 
-                $progress_overview = new \local_competvetsuivi\output\uevscompetency_overview(
+                $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
+                $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
+                $currentcomp = null;
+                if ($currentcompid) {
+                    $currentcomp = $matrix->comp[$currentcompid];
+                }
+
+                $progress_overview = new \local_competvetsuivi\renderable\uevscompetency_overview(
                         $matrix,
                         $ue->id,
                         $strandlist,
-                        0,
+                        $currentcomp,
                         $samesemester
                 );
 
