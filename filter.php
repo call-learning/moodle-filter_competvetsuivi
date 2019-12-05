@@ -55,7 +55,7 @@ class filter_competvetsuivi extends moodle_text_filter {
         return $text;
     }
 
-    const GRAPH_TYPES=['studentprogress','ucoverview'];
+    const GRAPH_TYPES=['studentprogress','ucoverview', 'ucsummary'];
 }
 
 function filter_competvetsuivi_replacebygraph($matches) {
@@ -159,6 +159,27 @@ function filter_competvetsuivi_replacebygraph($matches) {
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
                 $text = $renderer->render($progress_overview);
+                break;
+            case 'ucsummary':
+                try {
+                    $ue = $matrix->get_matrix_ue_by_criteria('shortname', $uename);
+                } catch( moodle_exception $e) {
+                    return $text;
+                }
+                $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
+                $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
+                $currentcomp = null;
+                if ($currentcompid) {
+                    $currentcomp = $matrix->comp[$currentcompid];
+                }
+
+                $progress_percent =  new \local_competvetsuivi\renderable\uevscompetency_summary(
+                        $matrix,
+                        $ue->id,
+                        $currentcomp
+                );
+                $renderer = $PAGE->get_renderer('local_competvetsuivi');
+                $text = $renderer->render($progress_percent);
                 break;
         }
     }
