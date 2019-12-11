@@ -127,7 +127,8 @@ function filter_competvetsuivi_replacebygraph($matches) {
                         $matrix,
                         $strandlist,
                         $userdata,
-                        $currentsemester
+                        $currentsemester,
+                        $user->id
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
                 $text = $renderer->render($progress_overview);
