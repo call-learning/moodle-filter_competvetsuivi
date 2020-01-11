@@ -13,7 +13,7 @@ Warning: due to current performance, it is advised to put only one tag on a page
 In a text editor within Moodle, go in HTML mode and enter the following tag:
 
 ````
-<competvetsuivi userid=<userid> type="studentprogress"></competvetsuivi>
+[competvetsuivi userid=<userid> type="studentprogress"][/competvetsuivi]
 ````
 
 
@@ -22,5 +22,11 @@ In a text editor within Moodle, go in HTML mode and enter the following tag:
 In a text editor within Moodle, go in HTML mode and enter the following tag:
 
 ````
-<competvetsuivi uename='UC54' type="ucoverview"></competvetsuivi>
+[competvetsuivi uename='UC54' type="ucoverview"][/competvetsuivi]
+````
+
+Or this one for the Doghnut graph:
+
+````
+[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucsummary"][/competvetsuivi]
 ````

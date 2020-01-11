@@ -43,13 +43,13 @@ class filter_competvetsuivi extends moodle_text_filter {
             return $text;
         }
 
-        if (stripos($text, '<competvetsuivi') === false) {
+        if (stripos($text, '[competvetsuivi') === false) {
             // Performance shortcut - if there is no </a> tag, nothing can match.
             return $text;
         }
 
         $text = preg_replace_callback(
-                '/(<competvetsuivi.*<\/competvetsuivi>)/',
+                '/(\[competvetsuivi.*\[\/competvetsuivi\])/',
                 'filter_competvetsuivi_replacebygraph',
                 $text);
         return $text;
@@ -64,7 +64,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
     $text = "";
     $doc = new DOMDocument();
     $fragment = $doc->createDocumentFragment();
-    $fragment->appendXML($matches[0]);
+    $fragment->appendXML(str_replace(["[","]"], ["<",">"], $matches[0]));
     $doc->appendChild($fragment);
 
     $comptag = $doc->getElementsByTagName('competvetsuivi');
