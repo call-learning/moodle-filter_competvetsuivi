@@ -23,6 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
 use local_competvetsuivi\ueutils;
 use local_competvetsuivi\utils;
 use local_competvetsuivi\matrix\matrix;
@@ -34,7 +35,6 @@ class filter_competvetsuivi extends moodle_text_filter {
             // TODO remove this function if deemed not necessary
         }
     }
-
 
     public function filter($text, array $options = array()) {
         global $USER;
@@ -55,7 +55,7 @@ class filter_competvetsuivi extends moodle_text_filter {
         return $text;
     }
 
-    const GRAPH_TYPES=['studentprogress','ucoverview', 'ucsummary'];
+    const GRAPH_TYPES = ['studentprogress', 'ucoverview', 'ucsummary'];
 }
 
 function filter_competvetsuivi_replacebygraph($matches) {
@@ -64,7 +64,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
     $text = "";
     $doc = new DOMDocument();
     $fragment = $doc->createDocumentFragment();
-    $fragment->appendXML(str_replace(["[","]"], ["<",">"], $matches[0]));
+    $fragment->appendXML(str_replace(["[", "]"], ["<", ">"], $matches[0]));
     $doc->appendChild($fragment);
 
     $comptag = $doc->getElementsByTagName('competvetsuivi');
@@ -73,9 +73,8 @@ function filter_competvetsuivi_replacebygraph($matches) {
         return $text;
     }
     $comptag = $comptag->item(0);
-    $graphtype = $comptag->attributes->getNamedItem('type')? $comptag->attributes->getNamedItem('type')->value: '';
-    $canproceed = $graphtype && in_array($graphtype,filter_competvetsuivi::GRAPH_TYPES);
-
+    $graphtype = $comptag->attributes->getNamedItem('type') ? $comptag->attributes->getNamedItem('type')->value : '';
+    $canproceed = $graphtype && in_array($graphtype, filter_competvetsuivi::GRAPH_TYPES);
 
     // Default values
     $userid = $USER->id;
@@ -94,21 +93,21 @@ function filter_competvetsuivi_replacebygraph($matches) {
             $canproceed = has_capability('block/competvetsuivi:canseeother', context_system::instance(), $USER);
         }
     } else {
-        $uename = $comptag->attributes->getNamedItem('uename')? $comptag->attributes->getNamedItem('uename')->value:'';
-        $matrixsn = $comptag->attributes->getNamedItem('matrix')? $comptag->attributes->getNamedItem('matrix')->value:'';
-        $samesemester = $comptag->attributes->getNamedItem('wholecursus')? false :true;
+        $uename = $comptag->attributes->getNamedItem('uename') ? $comptag->attributes->getNamedItem('uename')->value : '';
+        $matrixsn = $comptag->attributes->getNamedItem('matrix') ? $comptag->attributes->getNamedItem('matrix')->value : '';
+        $samesemester = $comptag->attributes->getNamedItem('wholecursus') ? false : true;
         $canproceed = $canproceed && $matrixsn && $DB->record_exists(
-                                local_competvetsuivi\matrix\matrix::CLASS_TABLE,array('shortname'=>$matrixsn));
+                        local_competvetsuivi\matrix\matrix::CLASS_TABLE, array('shortname' => $matrixsn));
 
         $matrixid = $DB->get_field(
-                local_competvetsuivi\matrix\matrix::CLASS_TABLE,'id',array('shortname'=>$matrixsn));
+                local_competvetsuivi\matrix\matrix::CLASS_TABLE, 'id', array('shortname' => $matrixsn));
     }
     $canproceed = $canproceed && $matrixid;
 
     if ($canproceed) {
         $matrix = new matrix($matrixid);
         $matrix->load_data();
-        switch($graphtype) {
+        switch ($graphtype) {
             case 'studentprogress':
                 $user = \core_user::get_user($userid);
                 $userdata = local_competvetsuivi\userdata::get_user_data($user->email);
@@ -131,17 +130,16 @@ function filter_competvetsuivi_replacebygraph($matches) {
                         $user->id
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = $renderer->render($progress_overview);
+                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid");
                 break;
             case 'ucoverview':
                 try {
                     $ue = $matrix->get_matrix_ue_by_criteria('shortname', $uename);
-                } catch( moodle_exception $e) {
+                } catch (moodle_exception $e) {
                     return $text;
                 }
 
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
-
 
                 $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
                 $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
@@ -159,12 +157,12 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 );
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = $renderer->render($progress_overview);
+                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid");
                 break;
             case 'ucsummary':
                 try {
                     $ue = $matrix->get_matrix_ue_by_criteria('shortname', $uename);
-                } catch( moodle_exception $e) {
+                } catch (moodle_exception $e) {
                     return $text;
                 }
                 $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
@@ -174,13 +172,13 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progress_percent =  new \local_competvetsuivi\renderable\uevscompetency_summary(
+                $progress_percent = new \local_competvetsuivi\renderable\uevscompetency_summary(
                         $matrix,
                         $ue->id,
                         $currentcomp
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = $renderer->render($progress_percent);
+                $text = \html_writer::div($renderer->render($progress_percent), "container-fluid");
                 break;
         }
     }
