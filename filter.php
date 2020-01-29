@@ -130,7 +130,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                         $user->id
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_overview), "container");
+                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid");
                 break;
             case 'ucoverview':
                 try {
@@ -157,7 +157,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 );
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_overview), "container");
+                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid");
                 break;
             case 'ucsummary':
                 try {
@@ -178,7 +178,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                         $currentcomp
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_percent), "container");
+                $text = \html_writer::div($renderer->render($progress_percent), "container-fluid");
                 break;
         }
     }
