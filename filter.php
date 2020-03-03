@@ -28,83 +28,116 @@ use local_competvetsuivi\ueutils;
 use local_competvetsuivi\utils;
 use local_competvetsuivi\matrix\matrix;
 
+/**
+ * This filter is used to insert graph in labels or other filterable content
+ *
+ * @copyright   2019 CALL Learning <laurent@call-learning.fr>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class filter_competvetsuivi extends moodle_text_filter {
-
-    public function setup($page, $context) {
-        if ($page->requires->should_create_one_time_item_now('filter_competvetsuivi')) {
-            // TODO remove this function if deemed not necessary
-        }
-    }
-
+    /**
+     * Usual filter function. Replace all [competvetsuivi ] tags by the respective graphs
+     *
+     * @param string $text
+     * @param array $options
+     * @return string|string[]|null
+     */
     public function filter($text, array $options = array()) {
-        global $USER;
         if (!is_string($text) or empty($text)) {
             // Non-string data can not be filtered anyway.
             return $text;
         }
 
         if (stripos($text, '[competvetsuivi') === false) {
-            // Performance shortcut - if there is no </a> tag, nothing can match.
+            // Performance shortcut - if there is no starting tag, nothing can match.
             return $text;
         }
 
         $text = preg_replace_callback(
-                '/(\[competvetsuivi.*\[\/competvetsuivi\])/',
-                'filter_competvetsuivi_replacebygraph',
-                $text);
+            '/(\[competvetsuivi[^]]*\][^[]*\[\/competvetsuivi\])/',
+            'filter_competvetsuivi_replacebygraph',
+            $text);
         return $text;
     }
 
+    /**
+     * Allowed types of graphs
+     */
     const GRAPH_TYPES = ['studentprogress', 'ucoverview', 'ucsummary'];
 }
 
+/**
+ * The filtering function
+ *
+ * @param array $matches matches provided by preg_replace_callback
+ * @return string the filtered content or empty if error
+ * @throws coding_exception
+ * @throws dml_exception
+ */
 function filter_competvetsuivi_replacebygraph($matches) {
     global $USER, $PAGE, $DB;
 
     $text = "";
-    $doc = new DOMDocument();
-    $fragment = $doc->createDocumentFragment();
-    $fragment->appendXML(str_replace(["[", "]"], ["<", ">"], $matches[0]));
-    $doc->appendChild($fragment);
-
-    $comptag = $doc->getElementsByTagName('competvetsuivi');
-
-    if (!$comptag || $comptag->length == 0) {
-        return $text;
-    }
-    $comptag = $comptag->item(0);
-    $graphtype = $comptag->attributes->getNamedItem('type') ? $comptag->attributes->getNamedItem('type')->value : '';
-    $canproceed = $graphtype && in_array($graphtype, filter_competvetsuivi::GRAPH_TYPES);
-
-    // Default values
+    $realxmltext = str_replace(["[", "]"], ["<", ">"], $matches[0]);
+    $comptag = simplexml_load_string($realxmltext);
+    // Default values.
     $userid = $USER->id;
     $matrixid = 0;
     $uename = "";
-    $samesemester = true;
+    $graphtype = 'ucoverview';
+    $samesemester = false;
 
-    if ($graphtype == 'studentprogress') {
-        $userid = $comptag->attributes->getNamedItem('userid')->value;
+    $error = false; // Check if there is an error.
 
-        if (!$userid || !is_numeric($userid)) {
-            $userid = $USER->id;
+    foreach ($comptag->attributes() as $aname => $value) {
+        $value = (string) $value;
+        switch ($aname) {
+            case 'type':
+                if (!in_array($value, filter_competvetsuivi::GRAPH_TYPES)) {
+                    $error = true;
+                } else {
+                    $graphtype = $value;
+                }
+                break;
+            case 'userid':
+                if ($value || is_numeric($value)) {
+                    if ($USER->id != $value) {
+                        if (has_capability('block/competvetsuivi:canseeother', context_system::instance(), $USER)) {
+                            $userid = $value;
+                            $matrixid = utils::get_matrixid_for_user($userid);
+                        } else {
+                            $error = true;
+                        }
+                    }
+                } else {
+                    $error = true;
+                }
+                break;
+
+            case 'uename':
+                $uename = $value;
+                break;
+
+            case 'matrix':
+                if ($DB->record_exists(
+                    local_competvetsuivi\matrix\matrix::CLASS_TABLE, array('shortname' => $value))) {
+                    $matrixid = $DB->get_field(
+                        local_competvetsuivi\matrix\matrix::CLASS_TABLE, 'id', array('shortname' => $value));
+                } else {
+                    $error = true;
+                }
+                break;
+            case 'wholecursus':
+                $samesemester = (bool) $value;
+                break;
         }
-        $matrixid = utils::get_matrixid_for_user($userid);
-        if ($USER->id != $userid) {
-            $canproceed = has_capability('block/competvetsuivi:canseeother', context_system::instance(), $USER);
-        }
-    } else {
-        $uename = $comptag->attributes->getNamedItem('uename') ? $comptag->attributes->getNamedItem('uename')->value : '';
-        $matrixsn = $comptag->attributes->getNamedItem('matrix') ? $comptag->attributes->getNamedItem('matrix')->value : '';
-        $samesemester = $comptag->attributes->getNamedItem('wholecursus') ? false : true;
-        $canproceed = $canproceed && $matrixsn && $DB->record_exists(
-                        local_competvetsuivi\matrix\matrix::CLASS_TABLE, array('shortname' => $matrixsn));
-
-        $matrixid = $DB->get_field(
-                local_competvetsuivi\matrix\matrix::CLASS_TABLE, 'id', array('shortname' => $matrixsn));
     }
-    $canproceed = $canproceed && $matrixid;
 
-    if ($canproceed) {
+    if (!$matrixid) {
+        $error = true;
+    }
+
+    if (!$error) {
         $matrix = new matrix($matrixid);
         $matrix->load_data();
         switch ($graphtype) {
@@ -121,16 +154,16 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progress_overview = new \local_competvetsuivi\renderable\competency_progress_overview(
-                        $currentcomp,
-                        $matrix,
-                        $strandlist,
-                        $userdata,
-                        $currentsemester,
-                        $user->id
+                $progressoverview = new \local_competvetsuivi\renderable\competency_progress_overview(
+                    $currentcomp,
+                    $matrix,
+                    $strandlist,
+                    $userdata,
+                    $currentsemester,
+                    $user->id
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid w-75");
+                $text = \html_writer::div($renderer->render($progressoverview), "container-fluid w-75");
                 break;
             case 'ucoverview':
                 try {
@@ -148,16 +181,16 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progress_overview = new \local_competvetsuivi\renderable\uevscompetency_overview(
-                        $matrix,
-                        $ue->id,
-                        $strandlist,
-                        $currentcomp,
-                        $samesemester
+                $progressoverview = new \local_competvetsuivi\renderable\uevscompetency_overview(
+                    $matrix,
+                    $ue->id,
+                    $strandlist,
+                    $currentcomp,
+                    $samesemester
                 );
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_overview), "container-fluid w-75");
+                $text = \html_writer::div($renderer->render($progressoverview), "container-fluid w-75");
                 break;
             case 'ucsummary':
                 try {
@@ -172,13 +205,13 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progress_percent = new \local_competvetsuivi\renderable\uevscompetency_summary(
-                        $matrix,
-                        $ue->id,
-                        $currentcomp
+                $progresspercent = new \local_competvetsuivi\renderable\uevscompetency_summary(
+                    $matrix,
+                    $ue->id,
+                    $currentcomp
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progress_percent), "container-fluid w-75");
+                $text = \html_writer::div($renderer->render($progresspercent), "container-fluid w-75");
                 break;
         }
     }
