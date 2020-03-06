@@ -79,7 +79,11 @@ function filter_competvetsuivi_replacebygraph($matches) {
 
     $text = "";
     $realxmltext = str_replace(["[", "]"], ["<", ">"], $matches[0]);
-    $comptag = simplexml_load_string($realxmltext);
+    try {
+        $comptag = simplexml_load_string($realxmltext);
+    } catch (Exception $e) {
+        return $e->getMessage();
+    }
     // Default values.
     $userid = $USER->id;
     $matrixid = 0;
