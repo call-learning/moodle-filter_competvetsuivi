@@ -45,14 +45,12 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
     }
 
     /**
-     * Tests the filter doesn't break anything if activated but no emoticons available.
+     * Test the filter display the graphs.
      *
      */
     public function test_filter_ucgraph() {
         global $CFG;
         $this->resetAfterTest();
-        // Empty the emoticons array.
-        $CFG->emoticons = null;
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
@@ -69,15 +67,31 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
             $filter->filter($input, ['originalformat' => FORMAT_HTML]));
     }
 
+
     /**
-     * Tests the filter doesn't break anything if activated but no emoticons available.
+     * Tests the filter doesn't break anything if there is an error in the markup.
+     *
+     */
+    public function test_filter_ucgraph_error() {
+        global $CFG;
+        $this->resetAfterTest();
+
+        $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
+
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" wholecursus="1" type="ucoverview" userid=<error>][/competvetsuivi]';
+        $expected = "simplexml_load_string(): Entity: line 1: parser error : AttValue: \" or ' expected";
+
+        $this->assertEquals($expected, $filter->filter($input, [
+            'originalformat' => FORMAT_HTML,
+        ]));
+    }
+    /**
+     * Tests the filter display multiple graphs in one.
      *
      */
     public function test_filter_ucgraph_multiple() {
         global $CFG;
         $this->resetAfterTest();
-        // Empty the emoticons array.
-        $CFG->emoticons = null;
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
@@ -95,14 +109,12 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
     }
 
     /**
-     * Tests the filter doesn't break anything if activated but no emoticons available.
+     * Test the filter does not break if content is mixed form.
      *
      */
     public function test_filter_ucgraph_mixedcontent() {
         global $CFG;
         $this->resetAfterTest();
-        // Empty the emoticons array.
-        $CFG->emoticons = null;
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
