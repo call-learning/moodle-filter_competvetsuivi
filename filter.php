@@ -222,7 +222,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $text = \html_writer::link($detaillinkurl,
                     \html_writer::div(
                         $renderer->render($progresspercent),
-                        "container-fluid"));
+                        "container-fluid w-75"));
                 break;
         }
     }
