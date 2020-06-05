@@ -1,6 +1,8 @@
 ## Compet Vet Suivi Filter
 
-Will embbed CompetVetSuivi graph types anywhere it can be done via text Filtering.
+[![Build Status](https://travis-ci.org/call-learning/moodle-filter_competvetsuivi.svg?branch=master)](https://travis-ci.org/call-learning/moodle-filter_competvetsuivi)
+
+Will embbed CompetVetSuivi (see https://github.com/call-learning/moodle-local_competvetsuivi) graph types anywhere it can be done via text Filtering.
 
 For now two types of graphs can be embedded:
 * Student results
