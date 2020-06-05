@@ -48,7 +48,7 @@ class filter_competvetsuivi extends moodle_text_filter {
             return $text;
         }
 
-        if (stripos($text, '[competvetsuivi') === false) {
+        if (false === stripos($text, '[competvetsuivi')) {
             // Performance shortcut - if there is no starting tag, nothing can match.
             return $text;
         }

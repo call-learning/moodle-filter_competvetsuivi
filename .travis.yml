@@ -17,7 +17,6 @@ cache:
 php:
   - 7.1
   - 7.2
-  - 7.3
 
 env:
   matrix:
@@ -35,6 +34,7 @@ before_install:
   - docker run -d -p 127.0.0.1:4444:4444 --net=host -v /dev/shm:/dev/shm selenium/standalone-firefox:2.53.1-beryllium
 
 install:
+  - moodle-plugin-ci add-plugin call-learning/moodle-local_competvetsuivi
   - moodle-plugin-ci install
 
 script:

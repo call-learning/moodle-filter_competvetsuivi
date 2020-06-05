@@ -49,7 +49,6 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
      *
      */
     public function test_filter_ucgraph() {
-        global $CFG;
         $this->resetAfterTest();
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
@@ -62,36 +61,34 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         ]));
 
         $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" wholecursus="1" type="ucdetails"][/competvetsuivi]';
-        $this->assertStringContainsString(
+        $this->assertContains(
             "Percentage the UC51 contributes to competencies and knowledge for the <strong>semester to which it belongs",
             $filter->filter($input, ['originalformat' => FORMAT_HTML]));
     }
-
 
     /**
      * Tests the filter doesn't break anything if there is an error in the markup.
      *
      */
     public function test_filter_ucgraph_error() {
-        global $CFG;
         $this->resetAfterTest();
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
-        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" wholecursus="1" type="ucdetails"'.
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" wholecursus="1" type="ucdetails"' .
             'userid=<error>][/competvetsuivi]';
-        $expected = "simplexml_load_string(): Entity: line 1: parser error : AttValue: \" or ' expected";
+        $expected = "simplexml_load_string(): Entity: line 1: parser error : attributes construct error";
 
         $this->assertEquals($expected, $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]));
     }
+
     /**
      * Tests the filter display multiple graphs in one.
      *
      */
     public function test_filter_ucgraph_multiple() {
-        global $CFG;
         $this->resetAfterTest();
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
@@ -101,11 +98,9 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
-        $this->assertStringContainsString(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>semester to which it belongs",
-            $result);
-        $this->assertStringContainsString(
-            "Percentage of competences and knowledge in UC51",
+        $this->assertContains(
+            "Percentage the UC51 contributes to competencies and knowledge for the " .
+            "<strong>semester to which it belongs</strong>",
             $result);
     }
 
@@ -114,7 +109,6 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
      *
      */
     public function test_filter_ucgraph_mixedcontent() {
-        global $CFG;
         $this->resetAfterTest();
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
@@ -124,11 +118,9 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
-        $this->assertStringContainsString(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>semester to which it belongs",
-            $result);
-        $this->assertStringContainsString(
-            "Percentage of competences and knowledge in UC51",
+        $this->assertContains(
+            "Percentage the UC51 contributes to competencies and knowledge for the " .
+            "<strong>semester to which it belongs</strong>",
             $result);
     }
 }
