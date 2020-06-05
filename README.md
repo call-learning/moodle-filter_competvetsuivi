@@ -22,7 +22,7 @@ In a text editor within Moodle, go in HTML mode and enter the following tag:
 In a text editor within Moodle, go in HTML mode and enter the following tag:
 
 ````
-[competvetsuivi uename='UC54' type="ucoverview"][/competvetsuivi]
+[competvetsuivi uename='UC54' type="ucdetails"][/competvetsuivi]
 ````
 
 Or this one for the Doghnut graph:

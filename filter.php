@@ -63,7 +63,7 @@ class filter_competvetsuivi extends moodle_text_filter {
     /**
      * Allowed types of graphs
      */
-    const GRAPH_TYPES = ['studentprogress', 'ucoverview', 'ucsummary'];
+    const GRAPH_TYPES = ['studentprogress', 'ucdetails', 'ucsummary'];
 }
 
 /**
@@ -75,7 +75,7 @@ class filter_competvetsuivi extends moodle_text_filter {
  * @throws dml_exception
  */
 function filter_competvetsuivi_replacebygraph($matches) {
-    global $USER, $PAGE, $DB;
+    global $USER, $PAGE, $DB, $CFG;
 
     $text = "";
     $realxmltext = str_replace(["[", "]"], ["<", ">"], $matches[0]);
@@ -88,7 +88,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
     $userid = $USER->id;
     $matrixid = 0;
     $uename = "";
-    $graphtype = 'ucoverview';
+    $graphtype = 'ucdetailsucdetails';
     $samesemester = false;
 
     $error = false; // Check if there is an error.
@@ -169,7 +169,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
                 $text = \html_writer::div($renderer->render($progressoverview), "container-fluid w-75");
                 break;
-            case 'ucoverview':
+            case 'ucdetails':
                 try {
                     $ue = $matrix->get_matrix_ue_by_criteria('shortname', $uename);
                 } catch (moodle_exception $e) {
@@ -178,14 +178,14 @@ function filter_competvetsuivi_replacebygraph($matches) {
 
                 $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
 
-                $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
+                $compidparamname = local_competvetsuivi\renderable\uevscompetency_details::PARAM_COMPID;
                 $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
                 $currentcomp = null;
                 if ($currentcompid) {
                     $currentcomp = $matrix->comp[$currentcompid];
                 }
 
-                $progressoverview = new \local_competvetsuivi\renderable\uevscompetency_overview(
+                $progressoverview = new \local_competvetsuivi\renderable\uevscompetency_details(
                     $matrix,
                     $ue->id,
                     $strandlist,
@@ -202,7 +202,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 } catch (moodle_exception $e) {
                     return $text;
                 }
-                $compidparamname = local_competvetsuivi\renderable\uevscompetency_overview::PARAM_COMPID;
+                $compidparamname = local_competvetsuivi\renderable\uevscompetency_details::PARAM_COMPID;
                 $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
                 $currentcomp = null;
                 if ($currentcompid) {
@@ -215,7 +215,14 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     $currentcomp
                 );
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');
-                $text = \html_writer::div($renderer->render($progresspercent), "container-fluid w-75");
+                $detaillinkurl = new \moodle_url(
+                    $CFG->wwwroot . '/local/competvetsuivi/pages/ucdetails.php',
+                    array('returnurl' => qualified_me(), 'ueid' => $ue->id, 'matrixid' => $matrix->id)
+                );
+                $text = \html_writer::link($detaillinkurl,
+                    \html_writer::div(
+                        $renderer->render($progresspercent),
+                        "container-fluid"));
                 break;
         }
     }
