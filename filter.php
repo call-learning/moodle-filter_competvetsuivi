@@ -89,7 +89,6 @@ function filter_competvetsuivi_replacebygraph($matches) {
     $matrixid = 0;
     $uename = "";
     $graphtype = 'ucdetailsucdetails';
-    $samesemester = false;
 
     $error = false; // Check if there is an error.
 
@@ -130,9 +129,6 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 } else {
                     $error = true;
                 }
-                break;
-            case 'wholecursus':
-                $samesemester = (bool) $value;
                 break;
         }
     }
@@ -176,8 +172,6 @@ function filter_competvetsuivi_replacebygraph($matches) {
                     return $text;
                 }
 
-                $strandlist = array(matrix::MATRIX_COMP_TYPE_KNOWLEDGE, matrix::MATRIX_COMP_TYPE_ABILITY);
-
                 $compidparamname = local_competvetsuivi\renderable\uevscompetency_details::PARAM_COMPID;
                 $currentcompid = optional_param($compidparamname, 0, PARAM_INT);
                 $currentcomp = null;
@@ -188,9 +182,7 @@ function filter_competvetsuivi_replacebygraph($matches) {
                 $progressoverview = new \local_competvetsuivi\renderable\uevscompetency_details(
                     $matrix,
                     $ue->id,
-                    $strandlist,
-                    $currentcomp,
-                    $samesemester
+                    $currentcomp
                 );
 
                 $renderer = $PAGE->get_renderer('local_competvetsuivi');

@@ -53,16 +53,16 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
-        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" wholecursus="1" type="ucdetails"][/competvetsuivi]';
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" type="ucdetails"][/competvetsuivi]';
         $expected = '';
 
         $this->assertEquals($expected, $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]));
 
-        $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" wholecursus="1" type="ucdetails"][/competvetsuivi]';
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"][/competvetsuivi]';
         $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>semester to which it belongs",
+            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
             $filter->filter($input, ['originalformat' => FORMAT_HTML]));
     }
 
@@ -75,7 +75,7 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
-        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" wholecursus="1" type="ucdetails"' .
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" type="ucdetails"' .
             'userid=<error>][/competvetsuivi]';
         $expected = "simplexml_load_string(): Entity: line 1: parser error : attributes construct error";
 
@@ -93,14 +93,13 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
-        $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" wholecursus="1" type="ucdetails"][/competvetsuivi]
+        $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"][/competvetsuivi]
         [competvetsuivi uename="UC51" matrix="MATRIX1" type="ucsummary"][/competvetsuivi]';
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
         $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the " .
-            "<strong>semester to which it belongs</strong>",
+            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
             $result);
     }
 
@@ -113,14 +112,13 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
 
         $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
 
-        $input = '<div><p>[competvetsuivi uename="UC51" matrix="MATRIX1" wholecursus="1" type="ucdetails"]AAAAAAA
+        $input = '<div><p>[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"]AAAAAAA
         <br/>[/competvetsuivi][competvetsuivi uename="UC51" matrix="MATRIX1" type="ucsummary"][/competvetsuivi]</p></div>';
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
         $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the " .
-            "<strong>semester to which it belongs</strong>",
+            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
             $result);
     }
 }
