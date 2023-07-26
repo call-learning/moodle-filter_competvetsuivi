@@ -34,8 +34,8 @@ require_once($CFG->dirroot . '/local/competvetsuivi/tests/lib.php');
  * @copyright 2019 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
-    public function setUp() {
+class filter_test extends competvetsuivi_tests {
+    public function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);
@@ -61,8 +61,8 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         ]));
 
         $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"][/competvetsuivi]';
-        $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
+        $this->assertStringContainsString(
+            "Contribution details to competencies and knowledge for the UC51",
             $filter->filter($input, ['originalformat' => FORMAT_HTML]));
     }
 
@@ -98,8 +98,8 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
-        $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
+        $this->assertStringContainsString(
+            "Contribution details to competencies and knowledge for the UC51",
             $result);
     }
 
@@ -117,8 +117,8 @@ class filter_competvetsuivi_filter_testcase extends competvetsuivi_tests {
         $result = $filter->filter($input, [
             'originalformat' => FORMAT_HTML,
         ]);
-        $this->assertContains(
-            "Percentage the UC51 contributes to competencies and knowledge for the <strong>whole cursus</strong>",
+        $this->assertStringContainsString(
+            "ontribution details to competencies and knowledge for the UC51",
             $result);
     }
 }
