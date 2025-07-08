@@ -22,19 +22,20 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace filter_competvetsuivi;
 
-global $CFG;
-require_once($CFG->dirroot . '/filter/competvetsuivi/filter.php');
-require_once($CFG->dirroot . '/local/competvetsuivi/tests/lib.php');
+use context_system;
+use local_competvetsuivi\tests\competvetsuivi_tests;
 
 /**
- * Tests for filter_multilang.
+ * Tests for filter_competvetsuivi.
  *
- * @copyright 2019 The Open University
+ * @copyright 2020 CALL Learning <laurent@call-learning.fr>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @coversDefaultClass  \filter_competvetsuivi\filter_test
  */
-class filter_test extends competvetsuivi_tests {
+final class filter_test extends competvetsuivi_tests {
     public function setUp(): void {
         parent::setUp();
 
@@ -46,12 +47,12 @@ class filter_test extends competvetsuivi_tests {
 
     /**
      * Test the filter display the graphs.
-     *
+     * @covers ::filter_ucgraph
      */
-    public function test_filter_ucgraph() {
+    public function test_filter_ucgraph(): void {
         $this->resetAfterTest();
 
-        $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
+        $filter = new text_filter(context_system::instance(), ['originalformat' => FORMAT_HTML]);
 
         $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" type="ucdetails"][/competvetsuivi]';
         $expected = '';
@@ -68,12 +69,12 @@ class filter_test extends competvetsuivi_tests {
 
     /**
      * Tests the filter doesn't break anything if there is an error in the markup.
-     *
+     * @covers ::filter_ucgraph
      */
-    public function test_filter_ucgraph_error() {
+    public function test_filter_ucgraph_error(): void {
         $this->resetAfterTest();
 
-        $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
+        $filter = new text_filter(context_system::instance(), ['originalformat' => FORMAT_HTML]);
 
         $input = '[competvetsuivi uename="UC51" matrix="MATRIXAAA" type="ucdetails"' .
             'userid=<error>][/competvetsuivi]';
@@ -86,12 +87,12 @@ class filter_test extends competvetsuivi_tests {
 
     /**
      * Tests the filter display multiple graphs in one.
-     *
+     * @covers ::filter_ucgraph
      */
-    public function test_filter_ucgraph_multiple() {
+    public function test_filter_ucgraph_multiple(): void {
         $this->resetAfterTest();
 
-        $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
+        $filter = new text_filter(context_system::instance(), ['originalformat' => FORMAT_HTML]);
 
         $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"][/competvetsuivi]
         [competvetsuivi uename="UC51" matrix="MATRIX1" type="ucsummary"][/competvetsuivi]';
@@ -105,12 +106,12 @@ class filter_test extends competvetsuivi_tests {
 
     /**
      * Test the filter does not break if content is mixed form.
-     *
+     * @covers ::filter_ucgraph
      */
-    public function test_filter_ucgraph_mixedcontent() {
+    public function test_filter_ucgraph_mixedcontent(): void {
         $this->resetAfterTest();
 
-        $filter = new filter_competvetsuivi(context_system::instance(), array('originalformat' => FORMAT_HTML));
+        $filter = new text_filter(context_system::instance(), ['originalformat' => FORMAT_HTML]);
 
         $input = '<div><p>[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"]AAAAAAA
         <br/>[/competvetsuivi][competvetsuivi uename="UC51" matrix="MATRIX1" type="ucsummary"][/competvetsuivi]</p></div>';

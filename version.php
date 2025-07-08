@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'filter_competvetsuivi';
-$plugin->release = '1.1.0';
-$plugin->version = 20202030300;
+$plugin->release = '1.2.0';
+$plugin->version = 2025062200;
 $plugin->requires = 2018051700;
 $plugin->maturity = MATURITY_RC;
-$plugin->dependencies = array(
+$plugin->dependencies = [
     'local_competvetsuivi' => ANY_VERSION,
-);
+];
