@@ -24,6 +24,7 @@
 namespace filter_competvetsuivi\output;
 
 use local_envasyllabus\output\course_syllabus;
+use local_envasyllabus\output\syllabus_header;
 use renderable;
 use renderer_base;
 use stdClass;
@@ -82,11 +83,8 @@ class ue_details extends course_syllabus implements renderable, templatable {
             $customfields[$shortname] = $cfdatacontroller->export_value();
         }
 
-        // Set programme and totals (from parent class).
-        $this->set_programme_and_totals($cfdata);
-
-        // Get header data using parent's method.
-        $context->headerdata = $this->get_header_data(self::CF_HEADER_DEFINITION, $customfields);
+        $headerdata = new syllabus_header($this->courseid);
+        $context->headerdata = $headerdata->export_for_template($output);
 
         return $context;
     }
