@@ -60,7 +60,7 @@ class text_filter extends moodle_text_filter {
      * @return string the filtered content or empty if error
      */
     public static function filter_competvetsuivi_replacebygraph(array $matches): string {
-        global $USER, $PAGE, $DB, $CFG;
+        global $USER, $PAGE, $DB, $CFG, $COURSE;
 
         $text = "";
         $realxmltext = str_replace(["[", "]"], ["<", ">"], $matches[0]);
@@ -107,10 +107,17 @@ class text_filter extends moodle_text_filter {
                     break;
 
                 case 'matrix':
-                    if ($DB->record_exists(
-                        \local_competvetsuivi\matrix\matrix::CLASS_TABLE, ['shortname' => $value])) {
+                    if (
+                        $DB->record_exists(
+                            \local_competvetsuivi\matrix\matrix::CLASS_TABLE,
+                            ['shortname' => $value]
+                        )
+                    ) {
                         $matrixid = $DB->get_field(
-                            \local_competvetsuivi\matrix\matrix::CLASS_TABLE, 'id', ['shortname' => $value]);
+                            \local_competvetsuivi\matrix\matrix::CLASS_TABLE,
+                            'id',
+                            ['shortname' => $value]
+                        );
                     } else {
                         $error = true;
                     }
@@ -191,20 +198,25 @@ class text_filter extends moodle_text_filter {
                         $ue->id,
                         $currentcomp
                     );
-                    $renderer = $PAGE->get_renderer('local_competvetsuivi');
+                    $competrenderer = $PAGE->get_renderer('local_competvetsuivi');
+                    $progresshtml = $competrenderer->render($progresspercent);
+
                     $detaillinkurl = new \moodle_url(
-                        $CFG->wwwroot . '/local/competvetsuivi/pages/ucdetails.php',
-                        ['returnurl' => qualified_me(), 'ueid' => $ue->id, 'matrixid' => $matrix->id]
+                        $CFG->wwwroot . '/local/envasyllabus/syllabuspage.php',
+                        ['id' => $COURSE->id]
                     );
-                    $text = \html_writer::link($detaillinkurl,
-                        \html_writer::div(
-                            $renderer->render($progresspercent),
-                            "container-fluid w-75"));
+
+                    $uedetails = new \filter_competvetsuivi\output\ue_details(
+                        $COURSE->id,
+                        $detaillinkurl->out(false),
+                        $progresshtml
+                    );
+                    $filterrenderer = $PAGE->get_renderer('filter_competvetsuivi');
+                    $text = $filterrenderer->render($uedetails);
                     break;
             }
         }
         return $text;
-
     }
 
     /**
@@ -228,8 +240,8 @@ class text_filter extends moodle_text_filter {
         $text = preg_replace_callback(
             '/(\[competvetsuivi[^]]*\][^[]*\[\/competvetsuivi\])/',
             self::class . '::filter_competvetsuivi_replacebygraph',
-            $text);
+            $text
+        );
         return $text;
     }
 }
-

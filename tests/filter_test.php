@@ -64,7 +64,8 @@ final class filter_test extends competvetsuivi_tests {
         $input = '[competvetsuivi uename="UC51" matrix="MATRIX1" type="ucdetails"][/competvetsuivi]';
         $this->assertStringContainsString(
             "Contribution details to competencies and knowledge for the UC51",
-            $filter->filter($input, ['originalformat' => FORMAT_HTML]));
+            $filter->filter($input, ['originalformat' => FORMAT_HTML])
+        );
     }
 
     /**
@@ -101,7 +102,8 @@ final class filter_test extends competvetsuivi_tests {
         ]);
         $this->assertStringContainsString(
             "Contribution details to competencies and knowledge for the UC51",
-            $result);
+            $result
+        );
     }
 
     /**
@@ -120,6 +122,7 @@ final class filter_test extends competvetsuivi_tests {
         ]);
         $this->assertStringContainsString(
             "ontribution details to competencies and knowledge for the UC51",
-            $result);
+            $result
+        );
     }
 }

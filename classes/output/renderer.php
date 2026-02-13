@@ -15,13 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Filter version and other meta-data are defined here.
+ * Renderer for filter_competvetsuivi
  *
  * @package     filter_competvetsuivi
- * @copyright   2019 CALL Learning <laurent@call-learning.fr>
+ * @copyright   2025 Bas Brands <bas@sonsbeekmedia.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace filter_competvetsuivi\output;
 
-defined('MOODLE_INTERNAL') || die();
-$string['filtername'] = 'CompetVetSuivi Filter';
-$string['viewsyllabus'] = 'View syllabus (program and evaluation methods)';
+/**
+ * Class renderer
+ *
+ * @package     filter_competvetsuivi
+ * @copyright   2025 Bas Brands <bas@sonsbeekmedia.nl>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class renderer extends \plugin_renderer_base {
+}

@@ -24,3 +24,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 $string['filtername'] = 'Filtre CompetVetSuivi';
+$string['viewsyllabus'] = 'Voir le syllabus (programme et modalités d\'évaluation)';
