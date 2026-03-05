@@ -22,6 +22,7 @@
     Example context (json):
     {
         "detailurl": "http://example.com/details",
+        "competvetdetailsurl": "http://example.com/competvetdetails",
         "progresshtml": "<div>Progress content</div>",
         "coursedata": {
             "fullname": "Course name",
@@ -37,7 +38,7 @@
         ]
     }
 }}
-<div class="container-fluid">
+<div class="competvetsuivi-ue-details container-fluid">
     <div class="row">
         <div class="col-12 col-lg-4 local-envasyllabus-course-syllabus">
             <div class="local-envasyllabus-course-syllabus-header d-flex mb-5 row no-gutters">
@@ -53,11 +54,13 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-5 d-flex flex-column align-items-end">
+        <div class="col-12 col-lg-5 d-flex flex-column">
             <div class="w-100 mb-3">
-                {{{progresshtml}}}
+                <a href="{{competvetdetailsurl}}" class="details-link">
+                    {{{progresshtml}}}
+                </a>
             </div>
-            <a href="{{{detailurl}}}" class="btn btn-primary">
+            <a href="{{{detailurl}}}" class="btn btn-primary w-75">
                 {{#str}}viewsyllabus, filter_competvetsuivi{{/str}}
             </a>
         </div>

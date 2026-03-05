@@ -205,10 +205,14 @@ class text_filter extends moodle_text_filter {
                         $CFG->wwwroot . '/local/envasyllabus/syllabuspage.php',
                         ['id' => $COURSE->id]
                     );
-
+                    $competvetdetailsurl = new \moodle_url(
+                        $CFG->wwwroot . '/local/competvetsuivi/pages/ucdetails.php',
+                        ['returnurl' => qualified_me(), 'ueid' => $ue->id, 'matrixid' => $matrix->id]
+                    );
                     $uedetails = new \filter_competvetsuivi\output\ue_details(
                         $COURSE->id,
                         $detaillinkurl->out(false),
+                        $competvetdetailsurl->out(false),
                         $progresshtml
                     );
                     $filterrenderer = $PAGE->get_renderer('filter_competvetsuivi');

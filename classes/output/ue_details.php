@@ -38,12 +38,6 @@ use templatable;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ue_details extends course_syllabus implements renderable, templatable {
-    /** @var string Detail link URL */
-    protected $detailurl;
-
-    /** @var string Rendered progress percent */
-    protected $progresshtml;
-
     /**
      * Constructor
      *
@@ -51,10 +45,17 @@ class ue_details extends course_syllabus implements renderable, templatable {
      * @param string $detailurl Detail link URL
      * @param string $progresshtml Rendered progress percent HTML
      */
-    public function __construct(int $courseid, string $detailurl, string $progresshtml) {
+    public function __construct(
+        /** @var int Course ID */
+        protected $courseid,
+        /** @var string Detail link URL */
+        protected string $detailurl,
+        /** @var string Competvet details URL */
+        protected string $competvetdetailsurl,
+        /** @var string Rendered progress percent */
+        protected string $progresshtml
+    ) {
         parent::__construct($courseid);
-        $this->detailurl = $detailurl;
-        $this->progresshtml = $progresshtml;
     }
 
     /**
@@ -69,7 +70,7 @@ class ue_details extends course_syllabus implements renderable, templatable {
         $context = new stdClass();
         $context->detailurl = $this->detailurl;
         $context->progresshtml = $this->progresshtml;
-
+        $context->competvetdetailsurl = $this->competvetdetailsurl;
         // Get course data for the header template.
         $course = $DB->get_record('course', ['id' => $this->courseid]);
         $coursecontext = \context_course::instance($this->courseid);
