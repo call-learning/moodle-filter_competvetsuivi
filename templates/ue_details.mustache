@@ -60,9 +60,11 @@
                     {{{progresshtml}}}
                 </a>
             </div>
-            <a href="{{{detailurl}}}" class="btn btn-primary w-75">
-                {{#str}}viewsyllabus, filter_competvetsuivi{{/str}}
-            </a>
+            {{#detailurl}}
+                <a href="{{{detailurl}}}" class="btn btn-primary w-75">
+                    {{#str}}viewsyllabus, filter_competvetsuivi{{/str}}
+                </a>
+            {{/detailurl}}
         </div>
     </div>
 </div>

@@ -201,17 +201,22 @@ class text_filter extends moodle_text_filter {
                     $competrenderer = $PAGE->get_renderer('local_competvetsuivi');
                     $progresshtml = $competrenderer->render($progresspercent);
 
-                    $detaillinkurl = new \moodle_url(
-                        $CFG->wwwroot . '/local/envasyllabus/syllabuspage.php',
-                        ['id' => $COURSE->id]
-                    );
+                    $envasyllabusplugin = \core_plugin_manager::instance()->get_plugin_info('local_envasyllabus');
+                    $detailurl = null;
+                    if ($envasyllabusplugin && !empty($CFG->enableenvasyllabus)) {
+                        $detaillinkurl = new \moodle_url(
+                            $CFG->wwwroot . '/local/envasyllabus/syllabuspage.php',
+                            ['id' => $COURSE->id]
+                        );
+                        $detailurl = $detaillinkurl->out(false);
+                    }
                     $competvetdetailsurl = new \moodle_url(
                         $CFG->wwwroot . '/local/competvetsuivi/pages/ucdetails.php',
                         ['returnurl' => qualified_me(), 'ueid' => $ue->id, 'matrixid' => $matrix->id]
                     );
                     $uedetails = new \filter_competvetsuivi\output\ue_details(
                         $COURSE->id,
-                        $detaillinkurl->out(false),
+                        $detailurl,
                         $competvetdetailsurl->out(false),
                         $progresshtml
                     );

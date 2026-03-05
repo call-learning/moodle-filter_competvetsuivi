@@ -21,41 +21,40 @@
  * @copyright   2025 Bas Brands <bas@sonsbeekmedia.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace filter_competvetsuivi\output;
 
-use local_envasyllabus\output\course_syllabus;
-use local_envasyllabus\output\syllabus_header;
 use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
 
 /**
- * UE details renderable - extends course_syllabus to reuse header logic
+ * UE details renderable
  *
  * @package     filter_competvetsuivi
  * @copyright   2025 Bas Brands <bas@sonsbeekmedia.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ue_details extends course_syllabus implements renderable, templatable {
+class ue_details implements renderable, templatable {
     /**
      * Constructor
      *
      * @param int $courseid Course ID
-     * @param string $detailurl Detail link URL
+     * @param string|null $detailurl Detail link URL or null when unavailable
+     * @param string $competvetdetailsurl Competvet details URL
      * @param string $progresshtml Rendered progress percent HTML
      */
     public function __construct(
         /** @var int Course ID */
         protected $courseid,
-        /** @var string Detail link URL */
-        protected string $detailurl,
+        /** @var string|null Detail link URL or null when unavailable */
+        protected ?string $detailurl,
         /** @var string Competvet details URL */
         protected string $competvetdetailsurl,
         /** @var string Rendered progress percent */
         protected string $progresshtml
     ) {
-        parent::__construct($courseid);
     }
 
     /**
@@ -65,27 +64,17 @@ class ue_details extends course_syllabus implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-        global $DB;
-
         $context = new stdClass();
         $context->detailurl = $this->detailurl;
         $context->progresshtml = $this->progresshtml;
         $context->competvetdetailsurl = $this->competvetdetailsurl;
-        // Get course data for the header template.
-        $course = $DB->get_record('course', ['id' => $this->courseid]);
-        $coursecontext = \context_course::instance($this->courseid);
 
-        // Get custom field info.
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
-        $cfdata = $handler->get_instance_data($this->courseid, true);
-        $customfields = [];
-        foreach ($cfdata as $cfdatacontroller) {
-            $shortname = $cfdatacontroller->get_field()->get('shortname');
-            $customfields[$shortname] = $cfdatacontroller->export_value();
+        $context->headerdata = [];
+        if ($this->detailurl !== null && class_exists('\local_envasyllabus\output\syllabus_header')) {
+            $headerclass = '\local_envasyllabus\output\syllabus_header';
+            $headerdata = new $headerclass($this->courseid);
+            $context->headerdata = $headerdata->export_for_template($output);
         }
-
-        $headerdata = new syllabus_header($this->courseid);
-        $context->headerdata = $headerdata->export_for_template($output);
 
         return $context;
     }
