@@ -1,6 +1,7 @@
 ## Compet Vet Suivi Filter
 
-[![Build Status](https://travis-ci.org/call-learning/moodle-filter_competvetsuivi.svg?branch=master)](https://travis-ci.org/call-learning/moodle-filter_competvetsuivi)
+[![PHP Unit and Behat tests](https://github.com/call-learning/moodle-filter_competvetsuivi/actions/workflows/code-test.yml/badge.svg)](https://github.com/call-learning/moodle-filter_competvetsuivi/actions/workflows/code-test.yml)
+[![Static code analysis tests](https://github.com/call-learning/moodle-filter_competvetsuivi/actions/workflows/static-ci.yml/badge.svg)](https://github.com/call-learning/moodle-filter_competvetsuivi/actions/workflows/static-ci.yml)
 
 Will embbed CompetVetSuivi (see https://github.com/call-learning/moodle-local_competvetsuivi) graph types anywhere it can be done via text Filtering.
 

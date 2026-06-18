@@ -20,6 +20,7 @@
  * @package     filter_competvetsuivi
  * @copyright   2019 CALL Learning <laurent@call-learning.fr>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @category    test
  */
 
 namespace filter_competvetsuivi;
@@ -32,14 +33,11 @@ use local_competvetsuivi\tests\competvetsuivi_tests;
  *
  * @copyright 2020 CALL Learning <laurent@call-learning.fr>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @coversDefaultClass  \filter_competvetsuivi\filter_test
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(text_filter::class)]
 final class filter_test extends competvetsuivi_tests {
     public function setUp(): void {
         parent::setUp();
-
-        $this->resetAfterTest(true);
 
         // Enable competvetsuivi filter at top level.
         filter_set_global_state('competvetsuivi', TEXTFILTER_ON);
@@ -47,7 +45,6 @@ final class filter_test extends competvetsuivi_tests {
 
     /**
      * Test the filter display the graphs.
-     * @covers ::filter_ucgraph
      */
     public function test_filter_ucgraph(): void {
         $this->resetAfterTest();
@@ -70,7 +67,6 @@ final class filter_test extends competvetsuivi_tests {
 
     /**
      * Tests the filter doesn't break anything if there is an error in the markup.
-     * @covers ::filter_ucgraph
      */
     public function test_filter_ucgraph_error(): void {
         $this->resetAfterTest();
@@ -88,7 +84,6 @@ final class filter_test extends competvetsuivi_tests {
 
     /**
      * Tests the filter display multiple graphs in one.
-     * @covers ::filter_ucgraph
      */
     public function test_filter_ucgraph_multiple(): void {
         $this->resetAfterTest();
@@ -108,7 +103,6 @@ final class filter_test extends competvetsuivi_tests {
 
     /**
      * Test the filter does not break if content is mixed form.
-     * @covers ::filter_ucgraph
      */
     public function test_filter_ucgraph_mixedcontent(): void {
         $this->resetAfterTest();
